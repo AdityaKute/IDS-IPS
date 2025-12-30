@@ -1,13 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from .. import db, crud, schemas
+from app.db import get_db
+from app import crud, schemas
 
-router = APIRouter(prefix='/alerts')
+router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
-@router.get('/')
-def get_alerts(db: Session = Depends(db.get_db)):
-    return crud.get_alerts(db)
-
-@router.post('/')
-def create_alert(alert: schemas.AlertCreate, db: Session = Depends(db.get_db)):
+@router.post("/")
+def create(alert: schemas.AlertCreate, db: Session = Depends(get_db)):
     return crud.create_alert(db, alert)

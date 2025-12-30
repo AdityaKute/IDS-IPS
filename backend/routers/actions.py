@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from ..utils import ips_actions
+from utils import ips_actions
 
 router = APIRouter(prefix='/actions')
 

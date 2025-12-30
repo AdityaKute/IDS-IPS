@@ -1,13 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from .. import db, crud, schemas
+from app.db import get_db
+from app import crud, schemas
 
-router = APIRouter(prefix='/rules')
+router = APIRouter(prefix="/rules", tags=["Rules"])
 
-@router.get('/')
-def list_rules(db: Session = Depends(db.get_db)):
-    return crud.get_rules(db)
-
-@router.post('/upsert')
-def upsert_rule(r: schemas.RuleCreate, db: Session = Depends(db.get_db)):
-    return crud.upsert_rule(db, r.name, r.json, r.enabled)
+@router.post("/")
+def upsert(rule: schemas.RuleCreate, db: Session = Depends(get_db)):
+    return crud.upsert_rule(db, rule)
