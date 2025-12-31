@@ -18,10 +18,20 @@ app.include_router(actions.router)
 
 @app.post('/token')
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(db.get_db)):
-    user = crud.get_user_by_username(db, form_data.username)
-    if not user or not auth.verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(status_code=400, detail='Incorrect username or password')
-    access_token = auth.create_access_token(data={'sub': user.username})
+    # here 'username' field will contain email (OAuth2 standard uses username param)
+    user = crud.get_user_by_email(db, form_data.username)
+    if not user:
+        raise HTTPException(status_code=400, detail='Incorrect email or password')
+    try:
+        ok = auth.verify_password(form_data.password, user.password_hash)
+    except ValueError as e:
+        # password too long or other hashing issue
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if not ok:
+        raise HTTPException(status_code=400, detail='Incorrect email or password')
+
+    access_token = auth.create_access_token(data={'sub': user.email})
     return {'access_token': access_token, 'token_type': 'bearer'}
 
 @app.get("/")

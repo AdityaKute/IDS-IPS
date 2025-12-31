@@ -12,15 +12,39 @@ SECRET_KEY = os.getenv('SECRET_KEY','secretkeyforproj')
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto', bcrypt__truncate_error=True)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
 
+def _ensure_password_length(password: str):
+    # bcrypt has a 72-byte limit for passwords. Enforce using UTF-8 bytes length.
+    if len(password.encode('utf-8')) > 72:
+        raise ValueError("Password too long: bcrypt supports max 72 bytes when UTF-8 encoded. Use a shorter password.")
+
+
+def _normalize_bcrypt_error(e: Exception) -> str:
+    msg = str(e) or ""
+    lm = msg.lower()
+    if 'password cannot be longer than 72 bytes' in lm or 'password too long' in lm or 'longer than 72' in lm:
+        return "Password too long: bcrypt supports a maximum of 72 bytes when UTF-8 encoded. Please use a shorter password."
+    return msg
+
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    _ensure_password_length(plain_password)
+    try:
+        return pwd_context.verify(plain_password, hashed_password)
+    except ValueError as e:
+        # map bcrypt/passlib error into a friendly message
+        raise ValueError(_normalize_bcrypt_error(e))
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    _ensure_password_length(password)
+    try:
+        return pwd_context.hash(password)
+    except ValueError as e:
+        # map bcrypt/passlib error into a friendly message
+        raise ValueError(_normalize_bcrypt_error(e))
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
@@ -45,14 +69,14 @@ def get_current_user(
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")
+        if email is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
 
     user = db.query(models.User).filter(
-        models.User.username == username
+        models.User.email == email
     ).first()
 
     if user is None:
@@ -64,7 +88,11 @@ def require_roles(allowed_roles: list):
     def role_checker(
         current_user=Depends(get_current_user)
     ):
-        if current_user.role not in allowed_roles:
+        # current_user.role is a Role ORM object; check its name
+        role_name = None
+        if getattr(current_user, 'role', None):
+            role_name = getattr(current_user.role, 'name', None)
+        if role_name is None or role_name not in allowed_roles:
             raise HTTPException(
                 status_code=403,
                 detail="Forbidden: Insufficient permissions"

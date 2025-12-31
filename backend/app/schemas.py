@@ -1,46 +1,69 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict, Any
 from datetime import datetime
 
+from pydantic import BaseModel, validator
+
 class UserCreate(BaseModel):
-    username: str
+    email: str
     password: str
-    role: Optional[str] = "member"
+    role: Optional[str] = "Viewer"
+
+    @validator('password')
+    def password_max_bytes(cls, v):
+        if len(v.encode('utf-8')) > 72:
+            raise ValueError('Password too long: bcrypt supports max 72 bytes when UTF-8 encoded')
+        return v
+
+class UserOut(BaseModel):
+    id: int
+    email: str
+    role: Optional[str]
+    is_active: bool
+    created_at: datetime
+    class Config:
+        orm_mode = True
 
 class AgentCreate(BaseModel):
-    hostname: str
-    ip_address: str
-    os_type: str
-    agent_version: Optional[str] = "1.0"
+    agent_id: str
+    hostname: Optional[str]
+    ip_address: Optional[str]
+    os: Optional[str]
 
 class RuleCreate(BaseModel):
     name: str
-    json: str
-    enabled: Optional[bool] = True
+    rule_type: str
+    condition: Dict[str, Any]
+    action: str
+    severity: Optional[str] = "MEDIUM"
+    is_active: Optional[bool] = True
 
 class ProcessEventCreate(BaseModel):
+    agent_id: int
     pid: int
     process_name: str
-    cmdline: str
     cpu_usage: float
     memory_usage: float
     event_type: str
 
 class NetworkEventCreate(BaseModel):
-    source_ip: str
-    source_port: int
-    destination_ip: str
-    destination_port: int
-    protocol: str
-    event_type: str
+    agent_id: int
+    local_ip: Optional[str]
+    remote_ip: Optional[str]
+    local_port: Optional[int]
+    remote_port: Optional[int]
+    protocol: Optional[str]
+    direction: Optional[str]
 
 class FileEventCreate(BaseModel):
+    agent_id: int
     file_path: str
-    operation: str
     event_type: str
 
 class AlertCreate(BaseModel):
-    level: str
-    rule: str
+    agent_id: int
+    rule_id: Optional[int]
+    title: Optional[str]
     description: str
-    metadata: Optional[str] = None
+    severity: Optional[str]
+    action_taken: Optional[str]
