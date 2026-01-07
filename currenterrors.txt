@@ -1,0 +1,9 @@
+1>Front-End 
+    1.css
+    2.functionality
+
+2>Back-End
+    1.functionalities in backend/app/
+    2.checking & changing other dependencies
+
+3>Connectivity with the processes and actions sync to buttons,pages in frontend and fetching it through backend and database

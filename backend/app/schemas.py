@@ -3,6 +3,13 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 from pydantic import BaseModel, validator
+# Detect Pydantic v2 availability. If v2 is present we will use `model_config`.
+try:
+    from pydantic import ConfigDict
+    PYDANTIC_V2 = True
+except Exception:
+    ConfigDict = None
+    PYDANTIC_V2 = False
 
 class UserCreate(BaseModel):
     email: str
@@ -21,14 +28,23 @@ class UserOut(BaseModel):
     role: Optional[str]
     is_active: bool
     created_at: datetime
-    class Config:
-        orm_mode = True
+    # configuration for pydantic v2 vs v1
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
 
 class AgentCreate(BaseModel):
     agent_id: str
     hostname: Optional[str]
     ip_address: Optional[str]
     os: Optional[str]
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
 
 class RuleCreate(BaseModel):
     name: str
@@ -37,6 +53,11 @@ class RuleCreate(BaseModel):
     action: str
     severity: Optional[str] = "MEDIUM"
     is_active: Optional[bool] = True
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
 
 class ProcessEventCreate(BaseModel):
     agent_id: int
@@ -45,6 +66,11 @@ class ProcessEventCreate(BaseModel):
     cpu_usage: float
     memory_usage: float
     event_type: str
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
 
 class NetworkEventCreate(BaseModel):
     agent_id: int
@@ -54,11 +80,21 @@ class NetworkEventCreate(BaseModel):
     remote_port: Optional[int]
     protocol: Optional[str]
     direction: Optional[str]
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
 
 class FileEventCreate(BaseModel):
     agent_id: int
     file_path: str
     event_type: str
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
 
 class AlertCreate(BaseModel):
     agent_id: int
@@ -67,3 +103,8 @@ class AlertCreate(BaseModel):
     description: str
     severity: Optional[str]
     action_taken: Optional[str]
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True

@@ -9,9 +9,11 @@ from app.db import get_db
 import os
 import bcrypt
 
-SECRET_KEY = os.getenv('SECRET_KEY','secretkeyforproj')
-ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    raise RuntimeError('SECRET_KEY environment variable is required')
+ALGORITHM = os.getenv('ALGORITHM', 'HS256')
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', '60'))
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto', bcrypt__truncate_error=True)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')

@@ -54,6 +54,24 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Centered page utility for landing / auth pages */
+.center-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.card {
+  width: 100%;
+  max-width: 720px;
+  background: rgba(255,255,255,0.02);
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

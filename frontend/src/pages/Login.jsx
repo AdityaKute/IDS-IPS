@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
-import { login, logout } from "../auth/auth";
+import { login, setRole } from "../auth/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [debug, setDebug] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
   const navigate = useNavigate();
 
   useEffect(() => {
-    setToken(localStorage.getItem("token") || "");
+    if (localStorage.getItem('token')) navigate('/dashboard');
   }, []);
 
 
@@ -37,37 +35,41 @@ export default function Login() {
       if (!tokenVal) {
         console.error('Login response missing token:', res);
         setError('Login failed: server did not return an access token');
-        setDebug({ ok: false, error: res?.data });
         return;
       }
       login(tokenVal);
-      setToken(tokenVal);
-      setDebug({ ok: true, data: res.data });
+
+      // fetch user info to get role
+      try {
+        const me = await api.get('/users/me');
+        const role = me?.data?.role;
+        if (role) setRole(role);
+      } catch (e) {
+        // Not fatal; continue
+        console.warn('Could not fetch user info after login', e);
+      }
+
       navigate("/dashboard");
     } catch (err) {
       // log full error to browser console for diagnosis
       console.error('Login error:', err);
       setError(err?.response?.data?.detail || err?.message || "Login failed");
-      setDebug({ ok: false, error: err?.response?.data || { message: err?.message } });
     }
   };
 
   return (
-    <div>
-      <h2>IDS/IPS Login</h2>
-      <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
-      <button onClick={handleLogin}>Login</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="center-page">
+      <div className="card">
+        <h2>IDS/IPS Login</h2>
+        <div style={{display:'flex', flexDirection:'column', gap:8}}>
+          <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
+          <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
+          <button onClick={handleLogin}>Login</button>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+        </div>
 
-      <div style={{border:'1px solid #ccc', padding:8, marginTop:12}}>
-        <h4>Debug 🐞</h4>
-        <p>Token: {token ? <code style={{wordBreak:'break-all'}}>{token}</code> : <em>none</em>}</p>
-        <button onClick={() => { logout(); setToken(''); }}>Clear token</button>
-        <pre style={{whiteSpace:'pre-wrap', marginTop:8}}>{JSON.stringify(debug, null, 2)}</pre>
+        <p style={{marginTop:12}}>Don't have an account? <Link to="/register">Register</Link></p>
       </div>
-
-      <p>Don't have an account? <Link to="/register">Register</Link></p>
     </div>
   );
 }

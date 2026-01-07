@@ -1,0 +1,3 @@
+1. resolved error in the register(post) & login(get)
+   from database and both are working fine the data 
+   can now be registered(stored) in db & login(fetched)

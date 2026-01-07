@@ -8,6 +8,7 @@ from app import models, crud, auth, db
 from app.db import engine, Base
 from routers import processes, alerts, rules, users, actions
 
+# NOTE: database schema is managed via migrations. Do not create tables implicitly in production.
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title='IDS-IPS Backend')
 
