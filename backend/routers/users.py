@@ -15,6 +15,9 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     except ValueError as e:
         # password validation (too long etc.)
         raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        # server-side/bcrypt initialization issue
+        raise HTTPException(status_code=500, detail=str(e))
 
     try:
         obj = crud.create_user(db, user, hashed)

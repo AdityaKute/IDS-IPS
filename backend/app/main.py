@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from app import models, crud, auth, db
@@ -9,6 +10,15 @@ from routers import processes, alerts, rules, users, actions
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title='IDS-IPS Backend')
+
+# allow Vite dev server (and similar) to call this API during local development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(processes.router)
 app.include_router(alerts.router)

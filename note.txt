@@ -5,13 +5,29 @@ backend
 3. venv\Scripts\activate
 4. pip install -r requirements.txt
 
+running backend
+
+uvicorn main:app --reload
+
+
 frontend
 
 1. cd frontend
 2. npm install
-3. npm run dev
+
+running frontend
+
+npm run dev
 
 database
 
 1. phpMyAdmin login with root
 2. from IDS-IPS/database/ids_ips_db.sql import ids_ips_db.sql in phpMyAdmin
+
+start db
+
+xml services start -> apache & mysql || wamp start services and make sure everything is running.
+
+performing GET & POST testing using Swagger
+
+http://127.0.0.1:8000/docs opens a fastapi testing in swagger ui

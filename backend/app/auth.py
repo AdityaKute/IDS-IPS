@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.db import get_db
 import os
+import bcrypt
 
 SECRET_KEY = os.getenv('SECRET_KEY','secretkeyforproj')
 ALGORITHM = 'HS256'
@@ -32,19 +33,26 @@ def _normalize_bcrypt_error(e: Exception) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     _ensure_password_length(plain_password)
     try:
-        return pwd_context.verify(plain_password, hashed_password)
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
     except ValueError as e:
-        # map bcrypt/passlib error into a friendly message
-        raise ValueError(_normalize_bcrypt_error(e))
+        # If bcrypt raises unexpectedly for a short password, treat it as a
+        # server-side issue so we return HTTP 500 instead of blaming the client.
+        if len(plain_password.encode('utf-8')) <= 72:
+            raise RuntimeError("bcrypt backend error during verification: " + str(e) + " Please check the server's bcrypt installation and restart the server.")
+        # Otherwise it's a client-side length issue.
+        raise ValueError("Password too long: bcrypt supports a maximum of 72 bytes when UTF-8 encoded. Please use a shorter password.")
 
 
 def get_password_hash(password: str) -> str:
     _ensure_password_length(password)
     try:
-        return pwd_context.hash(password)
+        # Use the bcrypt package directly to avoid passlib's bcrypt handler
+        # initialization path which can fail on some platforms.
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     except ValueError as e:
-        # map bcrypt/passlib error into a friendly message
-        raise ValueError(_normalize_bcrypt_error(e))
+        if len(password.encode('utf-8')) <= 72:
+            raise RuntimeError("bcrypt backend error during hashing: " + str(e) + " Please check the server's bcrypt installation and restart the server.")
+        raise ValueError("Password too long: bcrypt supports a maximum of 72 bytes when UTF-8 encoded. Please use a shorter password.")
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
