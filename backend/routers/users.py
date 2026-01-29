@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.db import get_db
-from app import crud, schemas, auth
+from app import crud, schemas, auth, models
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -45,3 +45,18 @@ def me(current_user = Depends(auth.get_current_user)):
         "is_active": current_user.is_active,
         "created_at": current_user.created_at,
     }
+
+@router.get('/')
+def list_users(current_user = Depends(auth.require_roles(['Admin'])), db: Session = Depends(get_db)):
+    """List all registered users (requires Admin role)"""
+    users = db.query(models.User).all()
+    return [
+        {
+            "id": u.id,
+            "email": u.email,
+            "role": u.role.name if u.role else None,
+            "is_active": u.is_active,
+            "created_at": u.created_at,
+        }
+        for u in users
+    ]

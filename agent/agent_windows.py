@@ -1,6 +1,7 @@
 import argparse
 import json
 import time
+import os
 from watcher import ProcessWatcher
 from reporter import Reporter
 from utils import rule_eval, action_executor
@@ -13,8 +14,20 @@ if __name__ == '__main__':
     parser.add_argument('--interval', type=int, default=2)
     args = parser.parse_args()
 
-    rep = Reporter(args.server)
+    rep = Reporter(args.server, api_key=os.environ.get('AGENT_API_KEY') or None)
     rules = json.load(open('rules.json'))
+
+    # start websocket listener for incoming actions/commands
+    api_key = os.environ.get('AGENT_API_KEY')
+    try:
+        import threading
+        from ws_client import start_background
+        if api_key:
+            t = threading.Thread(target=start_background, args=(args.server, api_key))
+            t.daemon = True
+            t.start()
+    except Exception:
+        pass
 
     def on_snapshot(snapshot):
         # Report log

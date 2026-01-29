@@ -3,3 +3,4 @@ wmi
 requests
 watchdog
 pywin32
+websockets

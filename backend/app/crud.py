@@ -80,3 +80,33 @@ def upsert_rule(db: Session, rule: schemas.RuleCreate):
 
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
+
+import secrets
+
+def create_agent(db: Session, agent: dict):
+    """Create or upsert agent; auto-generate api_token if not provided"""
+    existing = db.query(models.Agent).filter(models.Agent.agent_id == agent.get('agent_id')).first()
+    payload = {
+        'agent_id': agent.get('agent_id'),
+        'hostname': agent.get('hostname'),
+        'ip_address': agent.get('ip_address'),
+        'os': agent.get('os'),
+        'network_range': agent.get('network_range')
+    }
+    if existing:
+        for k, v in payload.items():
+            setattr(existing, k, v)
+        db.commit()
+        db.refresh(existing)
+        return existing
+    else:
+        api_token = agent.get('api_token') or secrets.token_urlsafe(32)
+        obj = models.Agent(**payload, api_token=api_token)
+        db.add(obj)
+        db.commit()
+        db.refresh(obj)
+        return obj
+
+
+def get_agent_by_agent_id(db: Session, agent_id: str):
+    return db.query(models.Agent).filter(models.Agent.agent_id == agent_id).first()

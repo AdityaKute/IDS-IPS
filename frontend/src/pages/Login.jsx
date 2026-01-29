@@ -6,19 +6,21 @@ import { login, setRole } from "../auth/auth";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     if (localStorage.getItem('token')) navigate('/dashboard');
-  }, []);
+  }, [navigate]);
 
+  const handleLogin = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
 
-  const handleLogin = async () => {
     // validate password length before sending (bcrypt limit)
     const len = new TextEncoder().encode(password).length;
     if (len > 72) {
-      setError("Password too long: must be 72 bytes or fewer when encoded in UTF-8");
+      setMessage("Password too long: must be 72 bytes or fewer when encoded in UTF-8");
       return;
     }
 
@@ -34,7 +36,7 @@ export default function Login() {
       const tokenVal = res?.data?.access_token;
       if (!tokenVal) {
         console.error('Login response missing token:', res);
-        setError('Login failed: server did not return an access token');
+        setMessage('Login failed: server did not return an access token');
         return;
       }
       login(tokenVal);
@@ -53,22 +55,97 @@ export default function Login() {
     } catch (err) {
       // log full error to browser console for diagnosis
       console.error('Login error:', err);
-      setError(err?.response?.data?.detail || err?.message || "Login failed");
+      setMessage(err?.response?.data?.detail || err?.message || "Login failed");
     }
   };
 
   return (
-    <div className="center-page">
-      <div className="card">
-        <h2>IDS/IPS Login</h2>
-        <div style={{display:'flex', flexDirection:'column', gap:8}}>
-          <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-          <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
-          <button onClick={handleLogin}>Login</button>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="main-wrapper">
+      <header className="header-content cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/')}>
+        <h1>
+          IDS / IPS <span className="blue-text">SECURITY SYSTEM</span>
+        </h1>
+        <div className="glow-line-main"></div>
+        <p className="subtitle">Intrusion Detection & Prevention</p>
+      </header>
+
+      <div className="auth-card">
+        {/* Section 1: Header */}
+        <div className="card-section top-section">
+          <h2 className="form-title">Login to Your Account</h2>
+          <div className="overlap-glow top-glow"></div>
         </div>
 
-        <p style={{marginTop:12}}>Don't have an account? <Link to="/register">Register</Link></p>
+        {/* Section 2: Form */}
+        <div className="card-section form-section">
+          <form onSubmit={handleLogin}>
+            <div className="input-group">
+              <div className="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm9 9v-1c0-3.866-3.582-7-9-7s-9 3.134-9 7v1h18z"/></svg>
+              </div>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <div className="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17 8h-1V6a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM9 6a3 3 0 0 1 6 0v2H9V6z"/></svg>
+              </div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="checkbox-row row-between">
+              <div className="checkbox-left">
+                <div className="custom-checkbox">
+                  <input
+                    id="remember"
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <span className="checkmark"></span>
+                </div>
+                <label htmlFor="remember">Remember Me</label>
+              </div>
+              <Link to="/forgot-password" size="small" className="accent-blue small-link">
+                Forgot Password?
+              </Link>
+            </div>
+
+            {message && (
+              <p className={`message-line ${message.includes("successful") ? 'success-text' : 'warning-text'}`}>
+                {message}
+              </p>
+            )}
+
+            <div className="btn-container">
+              <button type="submit" className="signup-btn">Login</button>
+            </div>
+          </form>
+        </div>
+
+        {/* Section 3: Footer */}
+        <div className="card-section footer-section">
+          <div className="overlap-glow bottom-glow"></div>
+          <div className="footer-content">
+            <p className="warning-text">Unauthorized Access is Prohibited</p>
+            <br />
+            <p className="login-footer">
+              Don't have an account? <Link to="/register" className="accent-blue">Register</Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -2,6 +2,10 @@ export const login = (token) => {
   localStorage.setItem("token", token);
 };
 
+export const getToken = () => {
+  return localStorage.getItem("token");
+};
+
 export const setRole = (role) => {
   if (role) localStorage.setItem("role", role);
 };

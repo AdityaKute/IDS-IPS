@@ -108,3 +108,115 @@ class AlertCreate(BaseModel):
     else:
         class Config:
             orm_mode = True
+
+# Attack intelligence schemas
+class AttackTypeCreate(BaseModel):
+    name: str
+    description: Optional[str]
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
+
+class AttackPatternCreate(BaseModel):
+    attack_type_id: int
+    process_name: Optional[str]
+    cmdline_regex: Optional[str]
+    url_pattern: Optional[str]
+    ip_pattern: Optional[str]
+    frequency_threshold: Optional[int] = 0
+    severity: Optional[str] = "MEDIUM"
+    recommended_action: Optional[str]
+    is_active: Optional[bool] = True
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
+
+class IPSActionCreate(BaseModel):
+    name: str
+    description: Optional[str]
+    system_action: str
+    params: Optional[Dict[str, Any]]
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
+
+class AuditLogOut(BaseModel):
+    id: int
+    action_type: str
+    actor: Optional[str]
+    target: Optional[str]
+    details: Optional[Dict[str, Any]]
+    timestamp: datetime
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
+
+class AgentRegister(BaseModel):
+    agent_id: str
+    hostname: Optional[str]
+    ip_address: Optional[str]
+    os: Optional[str]
+    network_range: Optional[str]
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
+
+class UnrecognizedAttackCreate(BaseModel):
+    agent_id: Optional[int]
+    telemetry: Optional[Dict[str, Any]]
+    assigned_severity: Optional[str] = 'LOW'
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
+
+class UnrecognizedAttackOut(BaseModel):
+    id: int
+    agent_id: Optional[int]
+    telemetry: Optional[Dict[str, Any]]
+    assigned_severity: Optional[str]
+    status: str
+    cluster_id: Optional[str]
+    learning_score: Optional[float]
+    created_at: datetime
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
+
+class ProposedPatternCreate(BaseModel):
+    name: Optional[str]
+    pattern: Dict[str, Any]
+    proposed_by: Optional[str]
+
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True
+
+class ProposedPatternOut(BaseModel):
+    id: int
+    name: Optional[str]
+    pattern: Dict[str, Any]
+    proposed_by: Optional[str]
+    status: str
+    votes: int
+    created_at: datetime
+    if PYDANTIC_V2:
+        model_config = ConfigDict(from_attributes=True)
+    else:
+        class Config:
+            orm_mode = True

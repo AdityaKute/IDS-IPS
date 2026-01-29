@@ -45,6 +45,11 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         raise ValueError("Password too long: bcrypt supports a maximum of 72 bytes when UTF-8 encoded. Please use a shorter password.")
 
 
+def hash_password(password: str) -> str:
+    """Hash a password for storage."""
+    return get_password_hash(password)
+
+
 def get_password_hash(password: str) -> str:
     _ensure_password_length(password)
     try:
@@ -93,6 +98,18 @@ def get_current_user(
         raise credentials_exception
 
     return user
+
+from fastapi import Header
+
+def get_agent_from_api_key(api_key: str = Header(None), db: Session = Depends(get_db)):
+    """Allow agents to authenticate by providing X-API-KEY header matching Agent.api_token"""
+    if not api_key:
+        raise HTTPException(status_code=401, detail='Missing API key')
+    agent = db.query(models.Agent).filter(models.Agent.api_token == api_key).first()
+    if not agent:
+        raise HTTPException(status_code=401, detail='Invalid API key')
+    return agent
+
 
 def require_roles(allowed_roles: list):
     def role_checker(

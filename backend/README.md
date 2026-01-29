@@ -34,5 +34,29 @@ Common endpoints:
 - GET `/rules` — list rules (requires auth)
 - POST `/rules` — upsert rule (admin only)
 - GET `/processes/recent` — recent process events (requires auth)
-- POST `/processes/log` — post process event
-- POST `/actions/*` — agent actions (admin only)
+- POST `/processes/log` — post process event (agents may authenticate via `X-API-KEY` header)
+- POST `/actions/*` — agent actions (admin only or agents with `X-API-KEY`)
+
+Realtime endpoints:
+- WebSocket `/realtime/ws/alerts?token=<JWT_or_agent_api_key>` — primary low-latency channel for alerts and commands
+- SSE `/realtime/sse/alerts?token=<JWT_or_agent_api_key>` — continuous alert stream (fallback)
+
+Agent registration:
+- Admins can register devices via POST `/agents/register` which returns an `api_token` for the agent.
+- Agents should store the `api_token` as `X-API-KEY` when calling the API or provide it as the WebSocket token.
+
+Unrecognized & Learning endpoints (admin-only):
+- GET `/attack-intel/unrecognized` — list recent unrecognized events
+- POST `/attack-intel/unrecognized/{id}/propose` — create a proposal from an unrecognized event
+- GET `/attack-intel/proposals` — list auto and admin proposals
+- POST `/attack-intel/proposals/{id}/approve` — approve a proposal (creates `AttackType` and `AttackPattern`)
+- POST `/attack-intel/learning/run` — manually trigger learning analysis
+
+Additional endpoints:
+- POST `/network/log` — post network event (agents may authenticate via `X-API-KEY` header)
+- GET `/network/recent` — recent network events
+- GET `/audit-logs` — admin-only: list audit logs
+
+Background jobs:
+- The backend starts a background daemon that runs `analyze_recent_unrecognized` every 5 minutes to auto-generate proposals from clusters of unrecognized events. For production, replace this lightweight thread with a persistent job runner (Redis / Celery / RQ).
+

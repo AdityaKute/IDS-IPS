@@ -7,6 +7,9 @@ import Processes from "./pages/Processes";
 import Alerts from "./pages/Alerts";
 import Rules from "./pages/Rules";
 import Users from "./pages/Users";
+import AttackIntel from "./pages/AttackIntel";
+import Unrecognized from "./pages/Unrecognized";
+import AuditLogs from "./pages/AuditLogs";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/DashboardLayout";
 
@@ -24,6 +27,15 @@ export default function App() {
             <Route path="/processes" element={<Processes />} />
             <Route path="/alerts" element={<Alerts />} />
             <Route path="/rules" element={<Rules />} />
+            <Route path="/attack-intel" element={<AttackIntel />} />
+            <Route path="/unrecognized" element={<Unrecognized />} />
+            <Route path="/audit-logs" element={<AuditLogs />} />
+          </Route>
+        </Route>
+
+        {/* Users management route */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
             <Route path="/users" element={<Users />} />
           </Route>
         </Route>

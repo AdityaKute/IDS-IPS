@@ -1,0 +1,426 @@
+@import "tailwindcss";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html, body, #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #0d1117 url('/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    background-color: #0d1117;
+    overflow: hidden;
+}
+
+.main-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.header-content {
+    text-align: center;
+    margin-bottom: 30px;
+    flex-shrink: 0;
+}
+
+.header-content:hover {
+    cursor: pointer;
+}
+
+.header-content h1 {
+    font-size: clamp(1.8rem, 5vw, 2.3rem);
+    letter-spacing: 2.5px;
+    font-weight: 700;
+}
+
+.blue-text { color: #5dade2; }
+
+.glow-line-main {
+    height: 2px;
+    width: min(380px, 90vw);
+    margin: 12px auto;
+    background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+    box-shadow: 0 0 12px #00d4ff;
+}
+
+.subtitle {
+    color: #f2f2f2;
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    font-weight: 300;
+}
+
+.auth-card {
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    width: min(440px, 95vw);
+    max-width: 440px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.card-section {
+    padding: clamp(15px, 4vw, 45px);
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.top-section {
+    padding-bottom: 10px;
+}
+
+.form-title {
+    color: #f2f2f2;
+    font-weight: 400;
+    font-size: 1.4rem;
+    text-align: center;
+    width: 100%;
+}
+
+.overlap-glow {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    z-index: 10;
+}
+
+.top-glow {
+    bottom: -1px;
+    background: linear-gradient(90deg, transparent, #3498db, transparent);
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.8);
+}
+
+/* Reduced gap between button and line */
+.bottom-glow {
+    top: 2px; 
+    width: 80%;
+    margin: 0 auto;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+}
+
+.form-section {
+    padding-top: 25px;
+    padding-bottom: 15px; /* Reduced from 25px to lower the gap */
+}
+
+form {
+    width: 100%;
+}
+
+.input-group {
+    display: flex;
+    margin-bottom: 18px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 5px;
+}
+
+.icon-container {
+    width: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.icon-container svg {
+    width: 18px;
+    height: 18px;
+    color: rgba(255,255,255,0.85);
+}
+
+.role-dropdown {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding-left: 12px;
+    color: white;
+    outline: none;
+    font-size: 1rem;
+    cursor: pointer;
+    appearance: none; /* Removes default browser arrow */
+    -webkit-appearance: none;
+    padding-right: 36px; /* space for arrow */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 20 12'><polyline points='1,1 10,10 19,1' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+
+input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding-left: 15px;
+    color: white;
+    outline: none;
+    font-size: 1rem;
+}
+
+input::placeholder { color: rgba(255, 255, 255, 0.7); }
+
+.role-dropdown {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding-left: 12px;
+    color: white;
+    outline: none;
+    font-size: 1rem;
+    cursor: pointer;
+    appearance: none; /* Removes default browser arrow */
+    -webkit-appearance: none;
+}
+
+/* Optional: Styles the dropdown options list */
+.role-dropdown option {
+    background: #1a1d23; /* Dark background so text is readable in the popup */
+    color: white;
+}
+
+/* Ensure the icon for the role looks correct */
+.fa-user-shield {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.checkbox-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    color: #f2f2f2;
+}
+
+.accent-blue {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.custom-checkbox {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+}
+
+.custom-checkbox input {
+    appearance: none;
+    width: 100%;
+    height: 100%;
+    border: 1px solid white;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.custom-checkbox .checkmark::after {
+    content: '';
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 4px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-checkbox input:checked + .checkmark::after { display: block; }
+
+.signup-btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: white;
+    border: 1px solid #1a3a5a;
+    background: linear-gradient(to bottom, #2b5d8a 0%, #000000 100%);
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: inset 0 1px 5px rgba(0, 212, 255, 0.4);
+}
+
+/* Reduced spacing between line and footer p tags */
+.footer-section {
+    padding-top: 10px;
+    padding-bottom: 25px;
+}
+
+.warning-text {
+    color: #ff3b3b;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.success-text {
+    color: #4ade80;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.message-line {
+    text-align: center;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+}
+
+.login-footer {
+    color: #f2f2f2;
+    font-size: 0.95rem;
+}
+
+.footer-content { text-align: center; }
+
+.full-width { width: 100%; }
+
+.textarea-large { min-height: 100px; padding-left: 12px; padding-top: 8px; width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.25); border-radius: 5px; color: white; }
+
+.narrow-text { max-width: 600px; margin: 0 auto; }
+
+.mt-18 { margin-top: 18px; }
+.row-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.small-link {
+    font-size: 0.85rem;
+}
+
+.stats-grid {
+    display: flex;
+    gap: 18px;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.stat-card {
+    flex: 1;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.cta-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    width: 100%;
+    margin-top: 18px;
+}
+
+.cta-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: transparent;
+    color: white;
+    cursor: pointer;
+}
+
+.cta-btn.primary {
+    background: linear-gradient(to bottom, #2b5d8a 0%, #000000 100%);
+    border: 1px solid #1a3a5a;
+}
+
+/* Dashboard scrolling styles */
+@media (min-width: 768px) {
+    body.dashboard-active {
+        overflow: auto;
+    }
+}
+
+/* Mobile and responsive adjustments */
+@media (max-width: 768px) {
+    .main-wrapper {
+        padding: 10px;
+    }
+
+    .header-content {
+        margin-bottom: 20px;
+    }
+
+    .card-section {
+        padding: 15px 20px;
+    }
+
+    .input-group {
+        height: 40px;
+        margin-bottom: 15px;
+    }
+
+    .icon-container {
+        width: 40px;
+    }
+
+    .role-dropdown,
+    input {
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+}
+
+@media (max-width: 480px) {
+    .main-wrapper {
+        padding: 10px;
+        justify-content: flex-start;
+        padding-top: 40px;
+    }
+
+    .header-content {
+        margin-bottom: 15px;
+    }
+
+    .auth-card {
+        width: 100%;
+        margin: 0 10px;
+    }
+
+    .card-section {
+        padding: 12px 15px;
+    }
+
+    .form-title {
+        font-size: 1.2rem;
+    }
+
+    .input-group {
+        height: 38px;
+        margin-bottom: 12px;
+    }
+
+    .signup-btn {
+        padding: 11px;
+        font-size: 1.1rem;
+    }
+}
